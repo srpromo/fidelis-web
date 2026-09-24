@@ -1,194 +1,34 @@
-import type { Candidate, ResearchRun } from "../types";
-export const demoThesis =
-  "AI infrastructure spending will create sustained demand for semiconductor manufacturing capacity.";
-const rows = [
-  [
-    "AMAT",
-    "Applied Materials",
-    "Semiconductor equipment",
-    94,
-    93,
-    "Finalist",
-    "Direct exposure to the tools used to expand manufacturing capacity.",
-    "Capacity expansion does not imply immediate equipment orders.",
-  ],
-  [
-    "KLAC",
-    "KLA Corporation",
-    "Process control & metrology",
-    91,
-    95,
-    "Finalist",
-    "Manufacturing complexity creates a plausible need for inspection and process control.",
-    "Demand varies with process mix and customer investment cycles.",
-  ],
-  [
-    "LRCX",
-    "Lam Research",
-    "Semiconductor equipment",
-    89,
-    92,
-    "Finalist",
-    "Deposition and etch tools are relevant to semiconductor fabrication investment.",
-    "Customer concentration and capital intensity remain relevant.",
-  ],
-  [
-    "ONTO",
-    "Onto Innovation",
-    "Process control & metrology",
-    84,
-    85,
-    "Finalist",
-    "Metrology and advanced packaging offer a plausible connection to capacity investment.",
-    "Exposure is narrower and execution assumptions need verification.",
-  ],
-  [
-    "NVDA",
-    "NVIDIA",
-    "Integrated devices",
-    82,
-    88,
-    "Watchlist",
-    "Compute demand is related to the thesis, with an indirect manufacturing-capacity link.",
-    "Strong thematic relevance is not the same as direct equipment exposure.",
-  ],
-  [
-    "AMD",
-    "Advanced Micro Devices",
-    "Semiconductor design",
-    77,
-    86,
-    "Watchlist",
-    "Compute products create an indirect link to semiconductor capacity demand.",
-    "Product competition and foundry dependence are not modeled.",
-  ],
-  [
-    "TER",
-    "Teradyne",
-    "Test & handling",
-    73,
-    84,
-    "Watchlist",
-    "Higher device complexity can increase the need for semiconductor testing.",
-    "Test demand need not move in step with wafer capacity.",
-  ],
-  [
-    "TXN",
-    "Texas Instruments",
-    "Integrated devices",
-    62,
-    81,
-    "Review",
-    "Manufacturing investment is relevant; the AI demand connection requires review.",
-    "Broad analog exposure makes thesis attribution uncertain.",
-  ],
+import type { Candidate, CausalPathway, SpecialistState, TrajectoryPoint, Chronology, CandidateDisposition } from '../types';
+export const observation = 'I keep seeing enormous spending on AI data centers. Everyone talks about GPUs, but power, cooling and networking have to be built around them. I think less obvious suppliers may benefit.';
+export const pathways: CausalPathway[] = [
+    { id: 'compute', label: 'Compute', mechanism: 'More workloads require processors; ownership of demand does not guarantee attractive expectations.', candidateIds: ['NVDA', 'AMD'] },
+    { id: 'network', label: 'Networking', mechanism: 'Larger clusters require equipment to move data between compute systems.', candidateIds: ['ANET', 'AVGO'] },
+    { id: 'optical', label: 'Optical connectivity', mechanism: 'Cluster scale raises interconnect requirements and opens a component-level pathway.', candidateIds: ['GLW', 'CRDO'] },
+    { id: 'thermal', label: 'Thermal management', mechanism: 'Higher rack density requires thermal infrastructure before capacity can be used.', candidateIds: ['VRT'] },
+    { id: 'power', label: 'Power & electrical', mechanism: 'Facilities depend on distribution equipment and reliable electrical capacity.', candidateIds: ['ETN', 'GEV', 'PWR'] }
+];
+function specialist(id: string, name: string, state: string, momentum: string, confidence: 'High' | 'Moderate' | 'Low', evidence: string, inference: string): SpecialistState { return { id, name, state, momentum, confidence, evidence: { text: evidence, sourceType: 'Sanitized demonstration observation', limitation: 'Not a current filing, quote, or executed specialist result.' }, inference: { text: inference, confidence } }; }
+const profiles = [
+    { ticker: 'VRT', company: 'Vertiv', pathway: 'thermal', points: [[65, 51], [82, 69], [79, 66], [80, 72]], gap: 'CLOSING POSITIVE GAP', cycle: 'EXPANDING', economic: 'Committed demand improving', market: 'Participation emerging', risk: 'Large orders can be delayed if customer sites lack power.', against: 'Orders are not completed deployments. Power bottlenecks could defer conversion beyond the thesis horizon.', verdict: 'CHALLENGE ABSORBED', final: 'ADVANCE', why: ['Relevant thermal-management pathway; economic and market states not evaluated.', 'Illustrative backlog strengthens while participation begins to broaden; the positive gap starts closing.', 'Conversion lag and shared customer dependencies temper the earlier opportunity state.', 'The causal link survives challenge, with conversion timing retained as a material condition.'] },
+    { ticker: 'ETN', company: 'Eaton', pathway: 'power', points: [[63, 57], [75, 70], [78, 73], [78, 75]], gap: 'POSITIVE GAP', cycle: 'EMERGING', economic: 'Demand breadth supportive', market: 'Selective recognition', risk: 'Lead-time normalization may erode pricing before capacity reaches revenue.', against: 'A shorter equipment cycle could leave expanded capacity underused and compress pricing.', verdict: 'CHALLENGE ABSORBED', final: 'ADVANCE', why: ['Electrical distribution creates a plausible exposure; not an attractiveness verdict.', 'Broad illustrative demand and cash conversion support economics; recognition remains selective.', 'Diversified end demand makes the transmission chain less dependent on one customer cohort.', 'Greater path durability offsets lower apparent upside relative to more concentrated peers.'] },
+    { ticker: 'ANET', company: 'Arista Networks', pathway: 'network', points: [[67, 54], [79, 65], [73, 56], [71, 59]], gap: 'ALIGNED', cycle: 'CONFIRMED', economic: 'Strong but concentrated', market: 'Expectations established', risk: 'A small customer cohort can shift architecture or internalize functionality.', against: 'A concentrated customer group may capture the economic benefit through pricing or a different network architecture.', verdict: 'CHALLENGE RAISED', final: 'ADVANCE', why: ['Cluster networking supplies a causal pathway; exposure is not yet economic proof.', 'Illustrative growth is supported by capital participation, but embedded expectations are substantial.', 'Customer concentration and vertical integration reduce risk adjusted potential.', 'The thesis survives conditionally; concentration remains more severe than in the electrical pathway.'] },
+    { ticker: 'NVDA', company: 'NVIDIA', pathway: 'compute', points: [[78, 54], [82, 55], [76, 48], [72, 45]], gap: 'NEGATIVE GAP', cycle: 'SATURATED', economic: 'Strong demand illustration', market: 'High recognition burden', risk: 'The thesis may already be reflected in demanding growth expectations.', against: 'Capacity spending can remain high while incremental return expectations decline.', verdict: 'MATERIAL CHALLENGE', final: 'HOLD', why: ['Direct compute relevance; market expectations have not yet been examined.', 'Illustrative demand is strong, but market expectations appear ahead of observed conversion.', 'Customer spending concentration leaves less room for a timing error.', 'Comparative synthesis holds this candidate: strong relevance alone is not a superior second-order expression.'] },
+    { ticker: 'AMD', company: 'Advanced Micro Devices', pathway: 'compute', points: [[60, 45], [63, 48], [57, 40], [52, 36]], gap: 'ALIGNED', cycle: 'EMERGING', economic: 'Exposure credible; conversion uncertain', market: 'Selective participation', risk: 'Product adoption may not translate into durable margin capture.', against: 'Customer adoption and pricing may favor competitors despite the industry expansion.', verdict: 'MATERIAL CHALLENGE', final: 'HOLD', why: ['Compute exposure established at a narrative level; results are not evaluated.', 'Demand potential and mixed illustrative conversion evidence remain in tension.', 'Competitive response weakens the transmission from industry demand to margin capture.', 'The retained adoption uncertainty prevents promotion to a research finalist.'] },
+    { ticker: 'AVGO', company: 'Broadcom', pathway: 'network', points: [[69, 52], [77, 59], [70, 51], [68, 48]], gap: 'ALIGNED', cycle: 'CONFIRMED', economic: 'Program-driven momentum', market: 'Strong participation', risk: 'Program concentration creates dependence on a narrow spending cycle.', against: 'Program timing and a concentrated customer set may overwhelm a favorable industry narrative.', verdict: 'MATERIAL CHALLENGE', final: 'HOLD', why: ['Connectivity and custom-compute exposure form the demo pathway.', 'Illustrative program demand improves while recognition already reflects much of that prospect.', 'Shared customers and lumpy program schedules reduce path tolerance.', 'Comparative review retains the opportunity but holds promotion pending broader conversion evidence.'] },
+    { ticker: 'GLW', company: 'Corning', pathway: 'optical', points: [[53, 44], [67, 56], [68, 57], [66, 55]], gap: 'POSITIVE GAP', cycle: 'EMERGING', economic: 'Relevant demand signal', market: 'Weak participation', risk: 'Diversified business exposure can dilute the thesis contribution.', against: 'Optical growth may be too small a share of total economics to drive the expected outcome.', verdict: 'CHALLENGE RAISED', final: 'HOLD', why: ['Optical connectivity creates plausible exposure with uncertain materiality.', 'Illustrative optical demand improves before broad security participation.', 'Causal relevance survives, but economic materiality limits the thesis contribution.', 'The challenge is magnitude rather than relevance; retain for inspection, not automatic promotion.'] },
+    { ticker: 'CRDO', company: 'Credo Technology', pathway: 'optical', points: [[65, 37], [82, 46], [73, 33], [65, 27]], gap: 'NEGATIVE GAP', cycle: 'SATURATED', economic: 'High potential, low confidence', market: 'Rapid recognition', risk: 'A concentrated adoption path and demanding expectations amplify timing risk.', against: 'One customer or technology change can impair both expected volumes and valuation support.', verdict: 'MATERIAL CHALLENGE', final: 'HOLD', why: ['Interconnect exposure is relevant, with limited breadth of supporting evidence.', 'Illustrative demand accelerates, but confidence remains low and market expectations expand faster.', 'Concentration and substitution fragility weaken risk adjusted potential despite high opportunity.', 'Evidence gaps remain material; a high opportunity coordinate is not sufficient for finalist status.'] },
+    { ticker: 'GEV', company: 'GE Vernova', pathway: 'power', points: [[61, 46], [73, 54], [64, 43], [55, 30]], gap: 'LARGE POSITIVE GAP', cycle: 'EXPANDING', economic: 'Committed demand; distant realization', market: 'Recognition expanding', risk: 'Generation build times can exceed the locked realization horizon.', against: 'The company can benefit eventually while failing the specific timing proposition of this research run.', verdict: 'THESIS FAILURE', final: 'THESIS_FAILURE', why: ['Power generation is relevant to data-center capacity; realization timing remains unexamined.', 'Illustrative order interest supports potential, with a long conversion lag.', 'Permitting and project schedules weaken the thesis within the selected horizon.', 'The fixture fails the bounded timing proposition; user preference cannot repair this upstream failure.'] },
+    { ticker: 'PWR', company: 'Quanta Services', pathway: 'power', points: [[56, 49], [69, 62], [73, 66], [72, 68]], gap: 'CLOSING POSITIVE GAP', cycle: 'EXPANDING', economic: 'Execution demand broadening', market: 'Recognition emerging', risk: 'Skilled labor availability and project execution can slow cash realization.', against: 'Infrastructure demand does not remove labor constraints or contract execution risk.', verdict: 'CHALLENGE ABSORBED', final: 'ADVANCE', recall: true, why: ['Recall candidate: the execution bottleneck was underrepresented in the initial map.', 'Illustrative infrastructure activity creates a stronger match than the initial universe captured.', 'Breadth supports durability; workforce constraints remain a shared execution dependency.', 'Adversarial review preserves the pathway with explicit labor and conversion conditions.'] }
 ] as const;
-export const candidates: Candidate[] = rows.map(
-  (
-    [
-      ticker,
-      company,
-      domain,
-      relevance,
-      strength,
-      disposition,
-      rationale,
-      limitations,
+export const candidates: Candidate[] = profiles.map(p => ({ ticker: p.ticker, company: p.company, pathway: p.pathway, recall: 'recall' in p, relationship: pathways.find(x => x.id === p.pathway)!.mechanism, exposure: 'High', evidenceConfidence: p.ticker === 'CRDO' ? 'Low' : 'Moderate', points: p.points.map(([ops, rap], t) => ({ t: t as Chronology, ops, rap, why: p.why[t], disposition: (t === 3 ? p.final : t === 2 && ['AMD', 'CRDO', 'GEV'].includes(p.ticker) ? 'REVIEW' : t === 1 && ['NVDA', 'AMD', 'AVGO', 'GLW', 'CRDO'].includes(p.ticker) ? 'HOLD' : 'ADVANCE') as CandidateDisposition })), gap: p.gap, volumeCycle: p.cycle, specialists: [
+        specialist('FQ-01', 'Fundamental Quality', p.economic, 'Stable to improving', 'Moderate', 'The fixture separates cash conversion from reported demand.', 'Economics require conversion into durable cash, not just reported orders.'),
+        specialist('DM-01', 'Business Demand', 'Illustrative orders supportive', 'Improving', p.ticker === 'CRDO' ? 'Low' : 'Moderate', 'Committed demand improves; pipeline and realized revenue remain distinct.', 'Demand duration is plausible but cancellations and conversion require scrutiny.'),
+        specialist('CF-01', 'Security Demand & Capital Flow', p.cycle, 'Broadening', 'Moderate', 'Illustrative relative volume increases with uneven participation persistence.', 'Participation supports a volume-cycle hypothesis independently of company economics.'),
+        specialist('VE-01', 'Valuation & Expectations', p.market, 'Expectation burden rising', 'Moderate', 'Illustrative expectations require sustained growth and margin delivery.', 'Expensive is not automatically overpriced; duration and growth assumptions matter.'),
+        specialist('TR-01', 'Technical Regime', 'Compression → tentative expansion', 'Expansion forming', 'Moderate', 'The fixture shows range compression followed by an unconfirmed expansion.', 'Technical state informs timing; it does not define economic truth.')
     ],
-    i,
-  ) => ({
-    ticker,
-    company,
-    domain,
-    evidence: {
-      strength,
-      summary:
-        "Illustrative business-profile summary representing the type of evidence a future bounded review would inspect. No live filing has been retrieved for this run.",
-      sourceTypes: [
-        "Annual business descriptions",
-        "Issuer product disclosures",
-      ],
-    },
-    inference: { relevance, rationale },
-    decision: {
-      eligibility: disposition === "Review" ? "Review" : "Eligible",
-      rank: i + 1,
-      liquidity: i < 3 ? "Tier A" : "Tier B",
-      disposition,
-    },
-    limitations,
-  }),
-);
-export function createDemoRun(thesis: string): ResearchRun {
-  return {
-    id: "FID-DEMO-001",
-    thesis,
-    status: "Ready",
-    candidates,
-    stages: [
-      {
-        id: "thesis",
-        label: "Thesis",
-        count: 128,
-        description: "Frame the relationship to be tested.",
-      },
-      {
-        id: "discovery",
-        label: "Discovery",
-        count: 128,
-        description: "Identify plausible securities across the value chain.",
-      },
-      {
-        id: "verification",
-        label: "Verification",
-        count: 42,
-        description:
-          "Separate plausible relevance from unsupported association.",
-      },
-      {
-        id: "eligibility",
-        label: "Eligibility",
-        count: 18,
-        description: "Apply the demonstration eligibility checks.",
-      },
-      {
-        id: "ranking",
-        label: "Ranking",
-        count: 8,
-        description: "Compare evidence, relevance and practical constraints.",
-      },
-      {
-        id: "analysis",
-        label: "Analysis",
-        count: 4,
-        description: "Inspect the shortlist and retain explicit uncertainty.",
-      },
-      {
-        id: "results",
-        label: "Results",
-        count: 4,
-        description:
-          "Four illustrative finalists. The decision remains inspectable.",
-      },
-    ],
-    exceptions: [
-      {
-        ticker: "TXN",
-        reason: "Thesis attribution uncertain",
-        consequence: "Retained for review; excluded from demo finalists.",
-      },
-      {
-        ticker: "Run-wide",
-        reason: "Simulated research metrics",
-        consequence:
-          "No valuation, current liquidity, eligibility or investment suitability is established.",
-      },
-    ],
-    provenance: {
-      mode: "Demonstration",
-      evidence: "Sanitized fixture",
-      providerCalls: 0,
-      governance: "Reproducible demo",
-    },
-  };
-}
+    causalLinks: [{ label: 'Infrastructure spend', state: 'Supported in fixture', explanation: 'This is the starting assumption, not a current spending measurement.' }, { label: 'Physical deployment', state: 'Dependency', explanation: 'Power access and customer schedules govern when spending becomes usable capacity.' }, { label: 'Company orders', state: 'Causal exposure', explanation: 'The relevant business pathway connects infrastructure requirements to company demand.' }, { label: 'Revenue → cash', state: 'Realization lag', explanation: p.risk }],
+    risk: { mechanism: p.risk, likelihood: 'Plausible; uncalibrated', severity: 'Material', horizon: 'Within thesis realization window', mitigation: 'Require conversion evidence before increasing confidence.', confidence: 'Moderate' }, analogue: 'Capital-buildout analogues suggest orders can lead cash realization. No historical dataset or calibrated base rate is supplied in this demo.', context: { macro: 'Higher real yields or tighter credit can defer customer construction and reduce tolerance for delayed cash flow.', industry: 'The illustrative neighborhood is expanding, but bottlenecks can move value between equipment and execution providers.', dependency: 'Shared hyperscaler budgets, power availability and construction schedules connect apparently different candidates.' }, adversarial: { verdict: p.verdict, caseFor: p.why[2], caseAgainst: p.against, alternative: 'The observed demand may represent front-loaded orders rather than a durable increase in end demand.', missing: 'Current contract terms, cancellation evidence and independent conversion checks are not available in this fixture.' }, comparative: p.why[3], integrity: { authority: 'Illustrative source types only; no primary evidence retrieved', freshness: 'No current timestamped observations', completeness: 'Material contract and conversion details missing', reproducibility: 'Fixed fixture version; deterministic replay' }, principalRisk: p.risk }));
+export const byTicker = Object.fromEntries(candidates.map(c => [c.ticker, c]));
+export const stageTitles = { DISCOVERY: 'Discovery', WASH_1: 'Reality & Recognition', WASH_2: 'Thesis Survival', WASH_3: 'Adversarial Confirmation' };
+export const operations = { DISCOVERY: ['Mapping causal pathways', 'Identifying economic exposures', 'Checking illustrative evidence coverage', 'Constructing candidate universe'], WASH_1: ['Freezing Economic Reality', 'Measuring Security Demand independently', 'Comparing expectations and technical regime', 'Revealing reality / recognition discrepancies'], WASH_2: ['Testing causal transmission', 'Challenging material fragility', 'Examining analogue limitations', 'Mapping shared dependencies'], WASH_3: ['Constructing the strongest opposing case', 'Testing alternative explanations', 'Checking evidence integrity', 'Synthesizing survivors comparatively'] };

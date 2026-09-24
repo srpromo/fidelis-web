@@ -1,112 +1,35 @@
-import { useEffect, useRef } from "react";
-import { X, FileText, ShieldCheck } from "lucide-react";
-import type { Candidate, Provenance } from "../types";
-export function CandidateDetail({
-  candidate: c,
-  provenance,
-  onClose,
-}: {
-  candidate: Candidate;
-  provenance: Provenance;
-  onClose: () => void;
+import { useEffect } from 'react';
+import { X } from 'lucide-react';
+import { byTicker } from '../data/demo';
+import type { ResearchRun } from '../types';
+import { WashAnalysis } from './WashAnalysis';
+export function CandidateDetail({ run, ticker, close }: {
+    run: ResearchRun;
+    ticker: string;
+    close: () => void;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const dialog = ref.current!;
-    dialog.showModal();
-    return () => dialog.close();
-  }, []);
-  return (
-    <dialog
-      ref={ref}
-      className="detail"
-      aria-labelledby="detail-title"
-      onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === ref.current) onClose();
-      }}
-    >
-      <div className="detail-inner">
-        <div className="detail-top">
-          <span className="eyebrow">CANDIDATE DOSSIER / DEMO</span>
-          <button
-            className="icon-button"
-            aria-label="Close candidate detail"
-            onClick={onClose}
-            autoFocus
-          >
-            <X size={20} />
-          </button>
-        </div>
-        <h2 id="detail-title">{c.ticker}</h2>
-        <p className="detail-company">{c.company}</p>
-        <p className="domain-label">{c.domain}</p>
-        <div className="detail-scores">
-          <div>
-            <span>Demo rank</span>
-            <strong>#{c.decision.rank}</strong>
-          </div>
-          <div>
-            <span>Relevance</span>
-            <strong>
-              {c.inference.relevance}
-              <small>/100</small>
-            </strong>
-          </div>
-          <div>
-            <span>Evidence</span>
-            <strong>
-              {c.evidence.strength}
-              <small>/100</small>
-            </strong>
-          </div>
-        </div>
-        <section>
-          <span className="tag evidence">EVIDENCE</span>
-          <h3>What the fixture represents</h3>
-          <p>{c.evidence.summary}</p>
-          <ul className="source-types">
-            {c.evidence.sourceTypes.map((s) => (
-              <li key={s}>
-                <FileText size={14} />
-                {s} <small>source type only</small>
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section>
-          <span className="tag inference">INFERENCE</span>
-          <h3>Why considered relevant</h3>
-          <p>{c.inference.rationale}</p>
-        </section>
-        <section>
-          <span className="tag decision">DECISION</span>
-          <h3>{c.decision.disposition}</h3>
-          <p>
-            {c.decision.eligibility} in this demonstration ·{" "}
-            {c.decision.liquidity} simulated liquidity. This disposition
-            illustrates a workflow, not an investment recommendation.
-          </p>
-        </section>
-        <section className="limitation">
-          <h3>Uncertainty stays visible</h3>
-          <p>
-            {c.limitations} The fixture establishes no current eligibility,
-            valuation or suitability.
-          </p>
-        </section>
-        <div className="provenance">
-          <ShieldCheck size={16} />
-          <div>
-            <strong>FID-DEMO-001 · {provenance.governance}</strong>
-            <p>
-              {provenance.evidence} · Provider calls: {provenance.providerCalls}
-              <br />
-              No live source retrieval. No raw filing text.
-            </p>
-          </div>
-        </div>
-      </div>
-    </dialog>
-  );
+    const c = byTicker[ticker];
+    const state = run.universe[ticker];
+    useEffect(() => { const dialog = document.getElementById('candidate-dialog') as HTMLDialogElement; dialog.showModal(); return () => dialog.close(); }, []);
+    return <dialog id="candidate-dialog" aria-label={`${ticker} research detail`} className="candidate-dialog" onCancel={close} onClick={e => {
+            if (e.target === e.currentTarget)
+                close();
+        }}>
+    <div className="detail-inner">
+    <button autoFocus className="close-button" onClick={close} aria-label="Close candidate detail">
+    <X size={20}/>
+    </button>
+    <small>RESEARCH RECORD · {state.userExcluded ? 'EXCLUDED BY YOU' : 'RETAINED'}</small>
+    <h2>{ticker}<span>{c.company}</span>
+    </h2>
+    <h3>Why it entered the thesis</h3>
+    <p>{c.relationship}</p>
+    <p>Exposure: {c.exposure}. Evidence confidence: {c.evidenceConfidence}. Sanitized fixture, not verified company research.</p>{state.trajectory.map(p => <div className="detail-snapshot" key={p.t}>
+        <small>T{p.t} · OPS {p.ops} / RAP {p.rap} · {p.t === 0 ? 'NOT YET EVALUATED' : p.disposition}</small>
+        <p>{p.why}</p>{p.t > 0 && <details>
+            <summary>Inspect Wash {p.t} findings</summary>
+            <WashAnalysis ticker={ticker} stage={p.t}/>
+            </details>}</div>)}<h3>Decision history</h3>{run.exclusions.filter(e => e.ticker === ticker).length ? run.exclusions.filter(e => e.ticker === ticker).map(e => <p key={e.event}>{e.stage}: {e.decision.replaceAll('_', ' ').toLowerCase()}</p>) : <p>No user exclusions recorded.</p>}<small>Fixture {run.provenance.fixtureVersion} · {run.provenance.evidenceId}</small>
+    </div>
+    </dialog>;
 }
