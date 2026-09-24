@@ -91,3 +91,15 @@ button:focus-visible, summary:focus-visible, a:focus-visible, [tabindex]:focus-v
   .research-canvas { padding-top: 30px; }
   .research-canvas h2 { font-size: 27px; }
 }
+
+/* Amendment A: proposition hierarchy through composition, not headline scale. */
+.final-thesis h2, .research-mode .final-thesis h2 {
+  font-size: 18px;
+  line-height: 1.65;
+  letter-spacing: -.01em;
+  font-weight: 400;
+}
+#composed-thesis:focus { outline: none; }
+@media (max-width: 600px) {
+  .final-thesis h2, .research-mode .final-thesis h2 { font-size: 17px; }
+}

@@ -28,19 +28,38 @@ export function ThesisChat({ messages, thesis, onSend, busy, locked }: {
 }) {
     const [text, setText] = useState('');
     const history = useRef<HTMLDivElement>(null);
+    const composer = useRef<HTMLTextAreaElement>(null);
+    const composing = useRef(false);
+    const restoreFocus = useRef(false);
     const ready = !!thesis?.proposition;
     useEffect(() => { history.current?.scrollTo({ top: history.current.scrollHeight, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); }, [messages.length]);
+    useEffect(() => {
+        if (!busy && restoreFocus.current) {
+            restoreFocus.current = false;
+            if (ready) document.getElementById('composed-thesis')?.focus({preventScroll:true});
+            else composer.current?.focus({preventScroll:true});
+        }
+    }, [busy, ready, messages.length, text]);
     return <section className={`thesis-chat ${ready ? 'resolved' : ''}`} aria-label="Thesis conversation">
  {messages.length > 0 && <div className="chat-history" ref={history} tabIndex={0} aria-label="Conversation history">
         <div aria-live="polite" aria-relevant="additions">{messages.map((m, i) => <ChatMessage key={i} message={m}/>)}</div>
         </div>}
  {!messages.length && <h1>What are you seeing?</h1>}
- {!ready && !locked && <form className="chat-composer" onSubmit={e => { e.preventDefault(); if (text.trim()) {
+ {!ready && !locked && <form className="chat-composer" onSubmit={e => { e.preventDefault(); if (text.trim() && !busy && !locked && !composing.current) {
+            restoreFocus.current = true;
             onSend(text.trim());
             setText('');
         } }}>
         <label className="sr-only" htmlFor="thought">{messages.length ? 'Your reply' : 'Your observation'}</label>
-        <textarea id="thought" value={text} onChange={e => setText(e.target.value)} rows={messages.length ? 2 : 3} placeholder={messages.length ? 'Your thought…' : 'Tell Fidelis what you’re noticing…'} disabled={busy}/>
+        <textarea id="thought" ref={composer}
+        onCompositionStart={() => {composing.current = true}}
+        onCompositionEnd={() => {composing.current = false}}
+        onKeyDown={e => {
+            if (e.key !== 'Enter' || e.shiftKey) return;
+            if (composing.current || e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) return;
+            e.preventDefault();
+            if (!e.repeat) e.currentTarget.form?.requestSubmit();
+        }} value={text} onChange={e => setText(e.target.value)} rows={messages.length ? 2 : 3} placeholder={messages.length ? 'Your thought…' : 'Tell Fidelis what you’re noticing…'} disabled={busy}/>
         <button type="submit" disabled={!text.trim() || busy} aria-label={messages.length ? 'Send reply' : 'Begin thesis conversation'}>
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
         <path d="M12 19V5m-6 6 6-6 6 6" fill="none" stroke="currentColor" strokeWidth="1.5"/>
@@ -72,7 +91,7 @@ export function FinalThesis({ thesis, onEdit, onLock, locked }: {
         <button onClick={() => setEditing(false)}>Cancel</button>
         </div>
         </> : <>
-        <h2>{thesis.proposition}</h2>
+        <h2 id="composed-thesis" tabIndex={-1}>{thesis.proposition}</h2>
         <details className="thesis-foundations">
         <summary>Explore the thesis foundations</summary>
         <dl>{[['Observation', thesis.observation], ['Causal mechanism', thesis.mechanism], ['Beneficiary profile', thesis.beneficiaries], ['Market misconception', thesis.recognition], ['Horizon', thesis.horizon], ['Falsifiers', thesis.falsifiers]].map(([k, v]) => <div key={k}>
