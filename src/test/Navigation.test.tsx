@@ -2,7 +2,7 @@ import {render,screen,fireEvent,waitFor,within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {it,expect,vi} from 'vitest';
 import App from '../App';
-it('navigates saved stages without restarting Discovery, preserves exclusions and stops before Wash 1',async()=>{
+it('navigates saved stages without restarting Discovery, preserves exclusions before entering Wash 1',async()=>{
  const fetch=vi.spyOn(globalThis,'fetch');
  const scroll=vi.fn();Element.prototype.scrollIntoView=scroll;
  const media=vi.spyOn(window,'matchMedia').mockReturnValue({matches:true} as MediaQueryList);
@@ -24,8 +24,8 @@ it('navigates saved stages without restarting Discovery, preserves exclusions an
  expect(document.getElementById('saved-discovery')).toHaveFocus();expect(screen.getByRole('region',{name:'Excluded by you'})).toHaveTextContent('VRT');
  expect(screen.getByText(/completed activity events/).textContent).toBe(history);
  fireEvent.click(screen.getByRole('button',{name:'Re-include VRT'}));expect(proceed).toHaveTextContent('7 candidates');
- fireEvent.click(proceed);expect(screen.getByText(/Discovery state ready to save/)).toBeVisible();expect(screen.getByText('Viewing saved Discovery · Research: Discovery')).toBeVisible();
- expect(within(nav).getByRole('button',{name:'Not yet available: Wash 1'})).toBeDisabled();expect(fetch).not.toHaveBeenCalled();media.mockRestore();fetch.mockRestore();
+ fireEvent.click(proceed);expect(screen.getByRole('region',{name:'Wash 1 research canvas'})).toBeVisible();expect(screen.getByText('Viewing saved Wash 1 · Research: Wash 1')).toBeVisible();
+ expect(within(nav).getByRole('button',{name:'Not yet available: Wash 2'})).toBeDisabled();expect(fetch).not.toHaveBeenCalled();media.mockRestore();fetch.mockRestore();
 });
 
 it('enables current Discovery during activity and keeps future stages blocked',async()=>{
