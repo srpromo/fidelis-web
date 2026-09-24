@@ -1,3 +1,7 @@
+import {startWash2,reduceWash2} from '../wash2/state';
+import {wash2Events} from '../wash2/fixtures';
+import {wash1Count} from '../wash1/model';
+import type {Wash2State,Wash2Action} from '../wash2/model';
 import {startWash1,reduceWash1} from '../wash1/state';
 import {wash1Events,wash1Fixtures} from '../wash1/fixtures';
 import type {Wash1State,Wash1Action} from '../wash1/model';
@@ -8,6 +12,7 @@ export type {ResearchActivityEvent} from '../discovery/model';
 export interface CheckpointRun extends ResearchRun {
     activity: ResearchActivityEvent[];
     wash1:Wash1State|null;
+    wash2:Wash2State|null;
     discovery: DiscoveryResult | null;
 }
 export interface AssistantRequest {
@@ -34,8 +39,8 @@ export const localAssistant: ThesisAssistant = { async respond({ message }) {
         horizon:'two years', falsifiers:'Projects are delayed or orders fail to convert into durable cash flow',
         proposition:'Over two years, AI data-center investment may benefit suppliers of power, cooling and connectivity before the market fully recognizes their contribution. Research will test whether committed demand becomes durable revenue and cash flow. The thesis weakens if projects are delayed or orders fail to convert into cash.'}};
 } };
-export function initialCheckpoint(): CheckpointRun { return { ...createRun(), runId: 'FID-DEMO-003', sessionId: 'checkpoint-1', provenance: { fixtureVersion: 'alpha-003-checkpoint-1', evidenceId: 'local-thesis-harness', mode: 'DEMONSTRATION', source: 'SANITIZED_FIXTURE', liveData: false }, activity: [], wash1:null, discovery:null }; }
-export type CheckpointAction = Wash1Action | DiscoveryAction | {
+export function initialCheckpoint(): CheckpointRun { return { ...createRun(), runId: 'FID-DEMO-003', sessionId: 'checkpoint-1', provenance: { fixtureVersion: 'alpha-003-checkpoint-1', evidenceId: 'local-thesis-harness', mode: 'DEMONSTRATION', source: 'SANITIZED_FIXTURE', liveData: false }, activity: [], wash1:null, wash2:null, discovery:null }; }
+export type CheckpointAction = Wash2Action | Wash1Action | DiscoveryAction | {
     type: 'REPLY';
     input: string;
     response: AssistantResponse;
@@ -46,6 +51,21 @@ export type CheckpointAction = Wash1Action | DiscoveryAction | {
     type: 'LOCK';
 };
 export function checkpointReducer(run: CheckpointRun, action: CheckpointAction): CheckpointRun {
+    if(run.wash2){
+        const wash2=reduceWash2(run.wash2,action as Wash2Action);
+        if(wash2===run.wash2)return run;
+        const completed=wash2.status==='COMPLETE'&&run.wash2.status!=='COMPLETE';
+        const universe={...run.universe};
+        if(completed)for(const t of wash2.participants)universe[t]={...universe[t],trajectory:[...universe[t].trajectory,wash2.results[t].t2]};
+        if(action.type==='CURATE_WASH2')universe[action.ticker]={...universe[action.ticker],userExcluded:wash2.excluded.includes(action.ticker)};
+        return {...run,wash2,universe,event:run.event+1,
+          activity:action.type==='WASH2_EVENT'?[...run.activity,wash2Events[action.index]]:run.activity,
+          exclusions:action.type==='CURATE_WASH2'?[...run.exclusions,{ticker:action.ticker,decision:wash2.excluded.includes(action.ticker)?'USER_EXCLUDED':'USER_RESTORED',stage:'WASH_2',event:run.event+1}]:run.exclusions,
+          washes:completed?[...run.washes,{stage:'WASH_2',participants:wash2.participants,analyzed:wash2.participants.length,advance:Object.values(wash2.results).filter(r=>r.disposition==='ADVANCE').length,held:Object.values(wash2.results).filter(r=>r.disposition!=='ADVANCE').length,failed:0,excluded:0,recallAdded:0,event:run.event+1}]:run.washes};
+    }
+    if(action.type==='START_WASH2'&&run.wash1?.status==='COMPLETE'&&wash1Count(run.wash1)>0){
+        return {...run,wash2:startWash2(run.wash1),wash1:{...run.wash1,readyForWash2:true},stage:'WASH_2',event:run.event+1};
+    }
     if(run.wash1){
         const wash1=reduceWash1(run.wash1,action as Wash1Action);
         if(wash1===run.wash1)return run;

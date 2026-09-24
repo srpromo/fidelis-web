@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-export type ViewedStage = 'Thesis' | 'Discovery' | 'Wash 1';
+export type ViewedStage = 'Thesis' | 'Discovery' | 'Wash 1' | 'Wash 2';
 export function ResearchHeader({locked, started, children}: {locked:boolean; started:boolean; children?:ReactNode}) {
  return <header className={`research-header ${locked?'compact':started?'conversing':''}`} aria-label={locked?'Research navigation':undefined}>
  <img className="canonical-logo" src={`${import.meta.env.BASE_URL}fidelis-logo.svg`} width="720" height="720" alt="Fidelis"/>
@@ -7,12 +7,14 @@ export function ResearchHeader({locked, started, children}: {locked:boolean; sta
  {!locked&&<button className="login" disabled title="Login is not available in this checkpoint">Log in</button>}
  </header>;
 }
-export function ProgressionRail({onNavigate,viewed,discoveryAvailable,discoveryComplete,washAvailable=false,washComplete=false}: {
- onNavigate:(stage:ViewedStage)=>void; viewed:ViewedStage; discoveryAvailable:boolean; discoveryComplete:boolean;washAvailable?:boolean;washComplete?:boolean;
+export function ProgressionRail({onNavigate,viewed,discoveryAvailable,discoveryComplete,washAvailable=false,washComplete=false,wash2Available=false,wash2Complete=false}: {
+ onNavigate:(stage:ViewedStage)=>void; viewed:ViewedStage; discoveryAvailable:boolean; discoveryComplete:boolean;washAvailable?:boolean;washComplete?:boolean;wash2Available?:boolean;wash2Complete?:boolean;
 }) {
- return <nav className="progression-rail" aria-label="Research progression">{['Thesis','Discovery','Wash 1','Wash 2','Wash 3','Expression','Result'].map((label,i)=>
- <div key={label} className={i===0||i===1&&discoveryComplete||i===2&&washComplete?'completed':i===(washAvailable?2:1)?'current':'future'}>
- <button disabled={i>2||i===2&&!washAvailable||i===1&&!discoveryAvailable} onClick={()=>onNavigate(label as ViewedStage)} aria-current={viewed===label?'location':undefined} aria-label={`${i>2||i===2&&!washAvailable?'Not yet available:':'View saved'} ${label}`}>
- <span className="progress-circle" aria-hidden="true">{i===0||i===1&&discoveryComplete||i===2&&washComplete?'✓':i===(washAvailable?2:1)?<i/>:null}</span><span>{label}</span>
- </button></div>)}</nav>;
+ const labels=['Thesis','Discovery','Wash 1','Wash 2','Wash 3','Expression','Result'];
+ const available=[true,discoveryAvailable,washAvailable,wash2Available,false,false,false];
+ const completed=[true,discoveryComplete,washComplete,wash2Complete,false,false,false];
+ const current=wash2Available?3:washAvailable?2:1;
+ return <nav className="progression-rail" aria-label="Research progression">{labels.map((label,i)=><div key={label} className={completed[i]?'completed':i===current?'current':'future'}>
+ <button disabled={!available[i]} onClick={()=>onNavigate(label as ViewedStage)} aria-current={viewed===label?'location':undefined} aria-label={`${available[i]?'View saved':'Not yet available:'} ${label}`}>
+ <span className="progress-circle" aria-hidden="true">{completed[i]?'✓':i===current?<i/>:null}</span><span>{label}</span></button></div>)}</nav>;
 }
