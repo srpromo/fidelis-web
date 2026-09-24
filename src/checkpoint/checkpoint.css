@@ -5,3 +5,89 @@
 
 .composition-area{display:grid;grid-template-rows:1fr;opacity:1;transition:grid-template-rows .65s ease,opacity .45s ease,transform .65s ease}.composition-inner{min-height:0;overflow:hidden}.composition-area.collapsed{grid-template-rows:0fr;opacity:0;transform:translateY(-16px);pointer-events:none}
 @media(prefers-reduced-motion:reduce){.composition-area{transition:none}}
+
+/* Checkpoint 1.1: density refinement; composition and transitions are unchanged. */
+:root { font-size: 14px; line-height: 1.55; }
+button:focus-visible, summary:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+  outline: 1px solid #aaa;
+  outline-offset: 4px;
+}
+.checkpoint { padding-bottom: 64px; }
+.thesis-chat h1 { font-size: 29px; margin: 16px 0 28px; }
+.chat-composer {
+  border-color: #202020;
+  background: #050505;
+  padding: 12px 52px 12px 16px;
+  margin-top: 18px;
+  border-radius: 5px;
+}
+.chat-composer textarea {
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 44px;
+  height: 44px;
+  max-height: 180px;
+  field-sizing: content;
+  border-bottom: 1px solid transparent;
+  caret-color: #eee;
+}
+@supports (field-sizing: content) {
+  .chat-composer textarea { height: auto; }
+}
+/* A local underline identifies keyboard focus without boxing the conversation. */
+.chat-composer textarea:focus { outline: none; }
+.chat-composer textarea:focus-visible { border-bottom-color: #777; outline: none; }
+.chat-composer button {
+  right: 12px;
+  bottom: 12px;
+  width: 28px;
+  height: 28px;
+  background: #c7c7c7;
+}
+.chat-composer button svg { width: 17px; height: 17px; }
+.chat-composer button:disabled { background: #181818; color: #777; }
+.chat-history { padding: 4px 14px 8px 4px; }
+.chat-message { margin-bottom: 21px; }
+.chat-message p { font-size: 14px; line-height: 1.7; margin-top: 6px; }
+.chat-message span { font-size: 9px; }
+.chat-message.user { margin-left: 44px; padding: 12px 16px; }
+.chat-message.user p { font-size: 14px; }
+.chat-message.fidelis { padding-top: 5px; }
+.example { font-size: 11px; margin: 16px 0; }
+.example button { font-size: 11px; margin-top: 10px; }
+.harness-note { margin-top: 18px; }
+.formation { font-size: 11px; margin: 17px 0; }
+.formation dl { margin: 10px 0; }
+.formation dl > div { padding: 4px 0; }
+.final-thesis { padding: 28px 0 16px; margin-top: 28px; }
+.overline { margin-bottom: 16px; }
+.final-thesis h2 { font-size: clamp(21px, 2.5vw, 27px); line-height: 1.5; margin-bottom: 22px; }
+.thesis-foundations { font-size: 11px; margin: 18px 0 24px; }
+.thesis-foundations dl > div { padding: 11px 0; }
+.thesis-foundations dd { font-size: 13px; }
+.thesis-actions button { padding: 10px 0; font-size: 12px; }
+.thesis-actions .commit-thesis { padding: 11px 16px; gap: 24px; }
+.final-thesis textarea { padding: 12px; }
+.lock-confirmation { margin-bottom: 26px; }
+.progression-rail { margin-bottom: 44px; }
+.research-canvas { padding: 42px 0 48px; }
+.research-canvas h2 { font-size: 31px; margin-bottom: 14px; }
+.research-canvas p { font-size: 14px; line-height: 1.7; }
+.research-canvas button { margin-top: 14px; padding: 11px 15px; font-size: 12px; }
+.research-mode .composition-area { margin-bottom: 30px; }
+.research-mode .final-thesis h2 { font-size: 22px; }
+@media (max-width: 600px) {
+  .checkpoint { padding-bottom: 42px; }
+  .thesis-chat h1 { font-size: 25px; margin: 12px 0 24px; }
+  .chat-composer { padding: 11px 48px 11px 14px; }
+  /* Retain 16px editable text on phones to avoid browser focus zoom. */
+  .chat-composer textarea { font-size: 16px; line-height: 1.45; min-height: 46px; }
+  .chat-message { margin-bottom: 19px; }
+  .chat-message.user { margin-left: 18px; padding: 10px 13px; }
+  .final-thesis { margin-top: 23px; padding-top: 23px; }
+  .final-thesis h2 { font-size: 21px; }
+  .thesis-actions .commit-thesis { gap: 10px; padding: 11px; }
+  .progression-rail { margin-bottom: 30px; }
+  .research-canvas { padding-top: 30px; }
+  .research-canvas h2 { font-size: 27px; }
+}
