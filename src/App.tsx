@@ -1,7 +1,8 @@
+import {DiscoveryExperience} from './discovery/DiscoveryExperience';
 import { useReducer, useState } from 'react';
 import { checkpointReducer, initialCheckpoint, localAssistant } from './checkpoint/research';
 import { ThesisChat, FinalThesis } from './checkpoint/ThesisChat';
-import { ResearchHeader, ProgressionRail, ResearchCanvas } from './checkpoint/ResearchCanvas';
+import { ResearchHeader, ProgressionRail } from './checkpoint/ResearchCanvas';
 export default function App() {
     const [run, dispatch] = useReducer(checkpointReducer, undefined, initialCheckpoint);
     const [busy, setBusy] = useState(false);
@@ -22,13 +23,13 @@ export default function App() {
     <main id="continuous-canvas" className="continuous-canvas">
  {locked && <>
         <p className="lock-confirmation" role="status">Thesis locked · {run.runId}</p>
-        <ProgressionRail onThesis={() => setReview(!review)} expanded={review}/>
+        <ProgressionRail onThesis={() => setReview(!review)} expanded={review} discoveryComplete={run.discovery?.status==='COMPLETE'}/>
         </>}
  <div className={`composition-area ${locked && !review ? 'collapsed' : ''}`} inert={locked && !review} aria-hidden={locked && !review}>
     <div className="composition-inner">
     <ThesisChat messages={run.conversation} thesis={thesis} onSend={send} busy={busy} locked={locked}/>{thesis?.proposition && <FinalThesis thesis={run.lockedThesis ?? thesis} locked={locked} onEdit={text => dispatch({ type: 'EDIT', text })} onLock={() => dispatch({ type: 'LOCK' })}/>}</div>
     </div>
- {locked && <ResearchCanvas />}
+ {locked && <DiscoveryExperience run={run} dispatch={dispatch}/>}
  </main>
     </div>;
 }

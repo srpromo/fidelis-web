@@ -1,13 +1,10 @@
 import type { ResearchRun, ThesisVersion } from '../types';
 import { createRun } from '../state/research';
-export interface ResearchActivityEvent {
-    id: string;
-    type: 'THESIS_LOCKED' | 'DISCOVERY_STARTED' | 'CAUSAL_MAP_BUILDING' | 'SOURCE_QUERY_STARTED' | 'CANDIDATE_IDENTIFIED' | 'EXPOSURE_VALIDATION_COMPLETE' | 'DISCOVERY_COMPLETE';
-    origin: 'LOCAL_DEMO' | 'FIDELIS_SERVICE';
-    message: string;
-}
+import {initialDiscovery,applyDiscoveryEvent,discoveryCounts,type ResearchActivityEvent,type DiscoveryResult,type DiscoveryAction} from '../discovery/model';
+export type {ResearchActivityEvent} from '../discovery/model';
 export interface CheckpointRun extends ResearchRun {
     activity: ResearchActivityEvent[];
+    discovery: DiscoveryResult | null;
 }
 export interface AssistantRequest {
     message: string;
@@ -40,8 +37,8 @@ export const localAssistant: ThesisAssistant = { async respond({ message, thesis
         next.proposition = `Over ${next.horizon}, AI data-center investment may benefit suppliers of power, cooling and connectivity before the market fully recognizes their contribution. The research will focus on ${focus}, testing whether orders become durable revenue and cash flow. The thesis weakens if ${next.falsifiers.replace(/[.!?]$/, '')}.`;
         return { thesis: next, message: 'This thesis is ready to research. We have a causal claim, a horizon and a way to be wrong. Review the proposition below before holding it fixed.' };
     } };
-export function initialCheckpoint(): CheckpointRun { return { ...createRun(), runId: 'FID-DEMO-003', sessionId: 'checkpoint-1', provenance: { fixtureVersion: 'alpha-003-checkpoint-1', evidenceId: 'local-thesis-harness', mode: 'DEMONSTRATION', source: 'SANITIZED_FIXTURE', liveData: false }, activity: [] }; }
-export type CheckpointAction = {
+export function initialCheckpoint(): CheckpointRun { return { ...createRun(), runId: 'FID-DEMO-003', sessionId: 'checkpoint-1', provenance: { fixtureVersion: 'alpha-003-checkpoint-1', evidenceId: 'local-thesis-harness', mode: 'DEMONSTRATION', source: 'SANITIZED_FIXTURE', liveData: false }, activity: [], discovery:null }; }
+export type CheckpointAction = DiscoveryAction | {
     type: 'REPLY';
     input: string;
     response: AssistantResponse;
@@ -52,8 +49,15 @@ export type CheckpointAction = {
     type: 'LOCK';
 };
 export function checkpointReducer(run: CheckpointRun, action: CheckpointAction): CheckpointRun {
-    if (run.lockedThesis)
+    if (run.lockedThesis && run.discovery) {
+        if(action.type==='DISCOVERY_EVENT') {const discovery=applyDiscoveryEvent(run.discovery,action.event);return discovery===run.discovery?run:{...run,discovery,activity:[...run.activity,action.event]};}
+        if(action.type==='CURATE_DISCOVERY'&&run.discovery.status==='COMPLETE') {
+            const old=run.discovery.candidates[action.ticker];if(!old||old.validation!=='VALIDATED')return run;
+            const excluding=old.userState==='RETAINED';return {...run,discovery:{...run.discovery,readyToSave:false,candidates:{...run.discovery.candidates,[action.ticker]:{...old,userState:excluding?'USER_EXCLUDED':'RETAINED'}},decisions:[...run.discovery.decisions,{ticker:action.ticker,decision:excluding?'USER_EXCLUDED':'USER_REINCLUDED',ordinal:run.discovery.decisions.length+1}]}};
+        }
+        if(action.type==='READY_FOR_WASH'&&run.discovery.status==='COMPLETE'&&discoveryCounts(run.discovery).proceed>0)return {...run,discovery:{...run.discovery,readyToSave:true}};
         return run;
+    }
     const event = run.event + 1;
     if (action.type === 'REPLY')
         return { ...run, event, stage: 'COMPOSITION', drafts: [...run.drafts, action.response.thesis], conversation: [...run.conversation, { role: 'user', text: action.input, event }, { role: 'fidelis', text: action.response.message, event }] };
@@ -61,6 +65,6 @@ export function checkpointReducer(run: CheckpointRun, action: CheckpointAction):
         return { ...run, event, drafts: [...run.drafts, { ...run.drafts.at(-1)!, version: run.drafts.at(-1)!.version + 1, proposition: action.text.trim() }] };
     }
     if (action.type === 'LOCK' && run.drafts.at(-1)?.proposition)
-        return { ...run, event, stage: 'DISCOVERY', lockedThesis: { ...run.drafts.at(-1)!, lockedAtEvent: event }, activity: [{ id: 'thesis-locked', type: 'THESIS_LOCKED', origin: 'LOCAL_DEMO', message: 'Thesis locked · FID-DEMO-003' }] };
+        return { ...run, event, stage: 'DISCOVERY', discovery:initialDiscovery(), lockedThesis: { ...run.drafts.at(-1)!, lockedAtEvent: event }, activity: [{ id: 'thesis-locked', type: 'THESIS_LOCKED', origin: 'LOCAL_DEMO', message: 'Thesis locked · FID-DEMO-003' }] };
     return run;
 }
