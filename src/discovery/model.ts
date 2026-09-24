@@ -1,10 +1,11 @@
+import type {Wash3EventType} from '../wash3/model';
 import type {Wash2EventType} from '../wash2/model';
 import type {Wash1EventType} from '../wash1/model';
 export type DiscoveryEventType='THESIS_LOCKED'|'DISCOVERY_STARTED'|'THESIS_CAUSAL_MAP_STARTED'|'THESIS_CAUSAL_MAP_COMPLETE'|'PATHWAY_IDENTIFIED'|'CANDIDATE_SEARCH_STARTED'|'CANDIDATE_IDENTIFIED'|'EXPOSURE_VALIDATION_STARTED'|'EXPOSURE_VALIDATION_COMPLETE'|'CANDIDATE_REJECTED'|'DISCOVERY_RECALL_STARTED'|'DISCOVERY_RECALL_CANDIDATE_IDENTIFIED'|'DISCOVERY_COMPLETE';
 export interface CausalRelationship {from:string;to:string;explanation:string}
 export interface DiscoveryPathway {id:string;label:string;relationship:CausalRelationship}
 export interface DiscoveryCandidate {ticker:string;company:string;pathway:string;relationship:string;exposure:'High'|'Moderate'|'Low'|'Unresolved';confidence:'High'|'Moderate'|'Low';recall?:boolean;rejection?:string}
-export interface ResearchActivityEvent {id:string;type:DiscoveryEventType|Wash1EventType|Wash2EventType;origin:'LOCAL_DEMO'|'FIDELIS_SERVICE';message:string;sequence?:number;pathway?:DiscoveryPathway;candidate?:DiscoveryCandidate;ticker?:string}
+export interface ResearchActivityEvent {id:string;type:DiscoveryEventType|Wash1EventType|Wash2EventType|Wash3EventType;origin:'LOCAL_DEMO'|'FIDELIS_SERVICE';message:string;sequence?:number;pathway?:DiscoveryPathway;candidate?:DiscoveryCandidate;ticker?:string}
 export interface CandidateDiscoveryState {candidate:DiscoveryCandidate;validation:'PENDING'|'VALIDATED'|'REJECTED';userState:'RETAINED'|'USER_EXCLUDED'}
 export interface UserCandidateDecision {ticker:string;decision:'USER_EXCLUDED'|'USER_REINCLUDED';ordinal:number}
 export interface DiscoveryResult {status:'RUNNING'|'COMPLETE';cursor:number;pathways:DiscoveryPathway[];candidates:Record<string,CandidateDiscoveryState>;decisions:UserCandidateDecision[];readyToSave:boolean}
