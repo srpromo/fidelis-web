@@ -24,3 +24,4 @@ HTMLDialogElement.prototype.close = function () {
     this.removeAttribute("open");
 };
 window.scrollTo = vi.fn();
+HTMLElement.prototype.scrollTo = vi.fn();

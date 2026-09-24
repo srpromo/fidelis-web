@@ -1,8 +1,8 @@
-# Fidelis Web Alpha 002
+# Fidelis Web Alpha 003 — Checkpoint 1
 
-A deterministic, public demonstration of a thesis-to-expression research journey. The interface preserves an observation, versioned thesis composition, locked thesis, causal discovery map, user curation, three research washes, chronological OPS/RAP snapshots, finalist selection, expression preferences, and a completed case for/against.
+A public, deterministic visual checkpoint: arrival → thesis conversation → editable proposition → frozen thesis → research canvas shell. Discovery is disabled. No research, provider, market-data, authentication or execution service is connected.
 
-All candidate findings, coordinates, market states and structures are sanitized illustrative fixtures. They are not live research, calibrated probabilities, market quotes, or execution recommendations. No provider, research, market-data or option-chain calls occur. The canonical Fidelis SVG is pending; only a text wordmark is used.
+The supplied canonical white Fidelis SVG is copied byte-for-byte into `public/fidelis-logo.svg`. Its source geometry and colors are unchanged.
 
 ## Run and validate
 
@@ -17,12 +17,12 @@ pnpm build
 pnpm scan
 ```
 
-GitHub Actions builds and deploys static assets with the `/fidelis-web/` base path. No runtime secrets are needed.
+GitHub Actions publishes the static build at `/fidelis-web/`.
 
-## Product boundaries
+## Checkpoint boundaries
 
-`ResearchRun` is the primary in-memory state object. The reducer preserves locked thesis versions, user decisions, completed snapshots, provenance, and expression preferences throughout the session. Reloading starts a fresh demonstration. A candidate excluded before a later wash keeps its original history; missing snapshots are never invented. Analytical holds are distinct from user exclusions. Thesis failures cannot enter finalist selection.
+`src/checkpoint` contains the conversational UI, a replaceable asynchronous local thesis-assistant adapter, a checkpoint reducer built around the existing `ResearchRun` contract, and a future `ResearchActivityEvent` seam. Only the actual local thesis-lock event is emitted. The same mounted logo and canvas transform after lock; retained conversation and frozen thesis can be reopened through the completed Thesis circle.
 
-Product-oriented components separate composition, discovery/curation, research progression, wash analysis, visual history, finalists, expression, and output. Provider contracts anticipate different reasoning providers consuming the same frozen evidence and deterministic snapshot. No provider connectivity is implemented. Independent authentication and entitlement policy boundaries are disabled; anonymous-to-owned continuity is a pure state transition.
+This temporary UX harness follows an AI-infrastructure thesis. It does not call or impersonate an external model. State remains in memory and resets on reload. Login is a visual placeholder.
 
-The demonstration ends at research output. No account service, payment, monitoring, portfolio, orders, private engine code, methodology weights, calibration data or operational control console is included.
+The previous wash, discovery and expression modules remain unchanged and are not rendered by this checkpoint. Further product work requires visual approval of the opening, conversation and transition.
