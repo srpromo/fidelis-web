@@ -18,25 +18,18 @@ export interface AssistantResponse {
 export interface ThesisAssistant {
     respond(request: AssistantRequest): Promise<AssistantResponse>;
 }
-export const localAssistant: ThesisAssistant = { async respond({ message, thesis }) {
-        if (!thesis)
-            return { message: 'There is a researchable idea here: spending on compute also requires physical infrastructure. Are you looking for businesses where the benefit is already appearing in results, or where it has not yet become visible?', thesis: { version: 1, observation: message, mechanism: 'AI data-center investment requires power, cooling and connectivity to turn compute spending into usable capacity.', beneficiaries: 'Suppliers of essential physical infrastructure around compute', pathways: 'Power, cooling and connectivity', exclusions: 'Narrative exposure without a direct economic link', recognition: '', horizon: '', falsifiers: '', proposition: '' } };
-        const next = { ...thesis, version: thesis.version + 1 };
-        if (!next.recognition) {
-            next.recognition = message;
-            return { thesis: next, message: /already|appearing|results/i.test(message) ? 'Then the distinction is between improving economics and how much the market already recognizes. We should look for conversion into revenue and cash, not simply more orders. Over what horizon should that difference become visible?' : 'Then we are testing a lag between infrastructure commitments and visible company economics. The missing link is conversion, not enthusiasm about AI. How long should that conversion have to become visible?' };
-        }
-        ;
-        if (!next.horizon) {
-            next.horizon = message;
-            return { thesis: next, message: `We’ll hold the idea to that horizon: ${message}. What would make you reconsider — orders failing to turn into cash, customer projects being delayed, or a different observation?` };
-        }
-        ;
-        next.falsifiers = message;
-        const focus = /already|appearing|results/i.test(next.recognition) && !/not|yet|before/i.test(next.recognition) ? 'improving company economics that market expectations may not fully reflect' : 'committed infrastructure demand whose economic contribution is not yet fully visible';
-        next.proposition = `Over ${next.horizon}, AI data-center investment may benefit suppliers of power, cooling and connectivity before the market fully recognizes their contribution. The research will focus on ${focus}, testing whether orders become durable revenue and cash flow. The thesis weakens if ${next.falsifiers.replace(/[.!?]$/, '')}.`;
-        return { thesis: next, message: 'This thesis is ready to research. We have a causal claim, a horizon and a way to be wrong. Review the proposition below before holding it fixed.' };
-    } };
+// One pass accelerates Alpha UX testing only. Production stops at thesis sufficiency,
+// with consequential clarification as needed, never at a fixed number of turns.
+export const localAssistant: ThesisAssistant = { async respond({ message }) {
+    return {message: 'I’ve structured your observation into a testable infrastructure thesis: investment creates demand for power, cooling and connectivity suppliers, while the market may underestimate the lag into revenue and cash. This demo uses a two-year horizon; delayed projects or failed cash conversion would weaken it. Review or edit those assumptions before locking.',
+    thesis: {version:1, observation:message,
+        mechanism:'AI data-center investment requires power, cooling and connectivity to turn compute spending into usable capacity.',
+        beneficiaries:'Suppliers of essential physical infrastructure around compute',
+        pathways:'Power, cooling and connectivity', exclusions:'Narrative exposure without a direct economic link',
+        recognition:'The market may underestimate committed demand whose economic contribution is not yet visible.',
+        horizon:'two years', falsifiers:'Projects are delayed or orders fail to convert into durable cash flow',
+        proposition:'Over two years, AI data-center investment may benefit suppliers of power, cooling and connectivity before the market fully recognizes their contribution. Research will test whether committed demand becomes durable revenue and cash flow. The thesis weakens if projects are delayed or orders fail to convert into cash.'}};
+} };
 export function initialCheckpoint(): CheckpointRun { return { ...createRun(), runId: 'FID-DEMO-003', sessionId: 'checkpoint-1', provenance: { fixtureVersion: 'alpha-003-checkpoint-1', evidenceId: 'local-thesis-harness', mode: 'DEMONSTRATION', source: 'SANITIZED_FIXTURE', liveData: false }, activity: [], discovery:null }; }
 export type CheckpointAction = DiscoveryAction | {
     type: 'REPLY';

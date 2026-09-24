@@ -103,3 +103,34 @@ button:focus-visible, summary:focus-visible, a:focus-visible, [tabindex]:focus-v
 @media (max-width: 600px) {
   .final-thesis h2, .research-mode .final-thesis h2 { font-size: 17px; }
 }
+
+/* Research-only orientation; saved-section navigation never changes run progress. */
+.research-header.compact { position:sticky; top:0; z-index:5; height:94px; padding:10px 0; gap:24px; justify-content:flex-start; background:#000; border-bottom:1px solid #262626; max-width:1120px; margin:auto auto 24px; }
+.research-header.compact .canonical-logo { width:62px; height:62px; flex:none; }
+.research-navigation { flex:1; min-width:0; }
+.compact .progression-rail { margin:0; gap:8px; animation:none; }
+.compact .progression-rail button { gap:5px; padding:5px; }
+.compact .progress-circle { width:19px; height:19px; font-size:9px; }
+.compact .progression-rail>div:after { top:14px; left:calc(50% + 17px); width:calc(100% - 27px); }
+.compact .progression-rail button[aria-current="location"] { color:#fff; text-decoration:underline; text-underline-offset:4px; }
+.viewing-state { font-size:10px; color:#888; margin:4px 0 0; text-align:center; }
+.sticky-proceed { flex:none; text-align:right; }
+.sticky-proceed button { font-size:11px; border:1px solid #444; padding:9px 12px; border-radius:3px; }
+.sticky-proceed small { display:block; color:#999; font-size:10px; }
+#saved-thesis,#saved-discovery { scroll-margin-top:0; }
+#saved-thesis:focus,#saved-discovery:focus { outline:none; }
+@media(max-width:760px) {
+ .research-header.compact { height:auto; min-height:112px; display:grid; grid-template-columns:44px minmax(0,1fr); gap:6px 12px; padding:8px 0; }
+ .research-header.compact .canonical-logo { width:44px; height:44px; }
+ .research-navigation { grid-column:1/-1; grid-row:2; }
+ .compact .progression-rail { overflow-x:auto; padding:3px; }
+ .compact .progression-rail>div { min-width:38px; font-size:7px; }
+ .compact .progression-rail button { padding:3px; }
+ .sticky-proceed { grid-column:2; grid-row:1; }
+ .sticky-proceed button { font-size:10px; padding:7px; }
+ .viewing-state { margin-top:2px; font-size:9px; }
+ #saved-thesis,#saved-discovery { scroll-margin-top:0; }
+}
+
+html:has(.research-mode) { scroll-padding-top:118px; }
+@media(max-width:760px) { html:has(.research-mode) { scroll-padding-top:140px; } }
