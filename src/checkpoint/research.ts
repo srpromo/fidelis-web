@@ -1,3 +1,5 @@
+import {completeResult} from '../result/synthesis';
+import type {ResultState,ResultAction} from '../result/model';
 import {startExpression,reduceExpression} from '../expression/state';
 import type {ExpressionState,ExpressionAction} from '../expression/model';
 import {startWash3,reduceWash3} from '../wash3/state';
@@ -21,6 +23,8 @@ export interface CheckpointRun extends ResearchRun {
     wash2:Wash2State|null;
     wash3:Wash3State|null;
     expression:ExpressionState|null;
+    result:ResultState|null;
+    completion:'IN_PROGRESS'|'RESEARCH_COMPLETE';
     discovery: DiscoveryResult | null;
 }
 export interface AssistantRequest {
@@ -47,8 +51,8 @@ export const localAssistant: ThesisAssistant = { async respond({ message }) {
         horizon:'two years', falsifiers:'Projects are delayed or orders fail to convert into durable cash flow',
         proposition:'Over two years, AI data-center investment may benefit suppliers of power, cooling and connectivity before the market fully recognizes their contribution. Research will test whether committed demand becomes durable revenue and cash flow. The thesis weakens if projects are delayed or orders fail to convert into cash.'}};
 } };
-export function initialCheckpoint(): CheckpointRun { return { ...createRun(), runId: 'FID-DEMO-003', sessionId: 'checkpoint-1', provenance: { fixtureVersion: 'alpha-003-checkpoint-1', evidenceId: 'local-thesis-harness', mode: 'DEMONSTRATION', source: 'SANITIZED_FIXTURE', liveData: false }, activity: [], wash1:null, wash2:null, wash3:null, expression:null, discovery:null }; }
-export type CheckpointAction = ExpressionAction | Wash3Action | Wash2Action | Wash1Action | DiscoveryAction | {
+export function initialCheckpoint(): CheckpointRun { return { ...createRun(), runId: 'FID-DEMO-003', sessionId: 'checkpoint-1', provenance: { fixtureVersion: 'alpha-003-checkpoint-1', evidenceId: 'local-thesis-harness', mode: 'DEMONSTRATION', source: 'SANITIZED_FIXTURE', liveData: false }, activity: [], wash1:null, wash2:null, wash3:null, expression:null, result:null, completion:'IN_PROGRESS', discovery:null }; }
+export type CheckpointAction = ResultAction | ExpressionAction | Wash3Action | Wash2Action | Wash1Action | DiscoveryAction | {
     type: 'REPLY';
     input: string;
     response: AssistantResponse;
@@ -59,6 +63,16 @@ export type CheckpointAction = ExpressionAction | Wash3Action | Wash2Action | Wa
     type: 'LOCK';
 };
 export function checkpointReducer(run: CheckpointRun, action: CheckpointAction): CheckpointRun {
+    if(run.result){
+        if(action.type==='SWITCH_RESULT_FINALIST'&&run.result.participants.includes(action.ticker))return {...run,result:{...run.result,active:action.ticker}};
+        if(action.type==='INSPECT_RESULT_TRANSITION'&&run.result.participants.includes(action.ticker)&&[0,1,2,3].includes(action.t))return {...run,result:{...run.result,inspected:{...run.result.inspected,[action.ticker]:action.t}}};
+        if(action.type==='SWITCH_EXPRESSION_FINALIST'||action.type==='INSPECT_EXPRESSION_FAMILY')return {...run,expression:reduceExpression(run.expression!,action)};
+        return run;
+    }
+    if(action.type==='READY_FOR_RESULT'){
+        const result=completeResult(run);
+        return result?{...run,result,completion:'RESEARCH_COMPLETE',stage:'OUTPUT',event:run.event+1}:run;
+    }
     if(run.expression){
         const expression=reduceExpression(run.expression,action as ExpressionAction);
         return expression===run.expression?run:{...run,expression,event:run.event+1};
