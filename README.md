@@ -1,18 +1,20 @@
-# Fidelis Web Alpha 003 — Checkpoint 5
+# Fidelis Web Alpha 003 — Complete through Result
 
-A public React/TypeScript prototype of a continuous thesis-to-research experience, implemented through Wash 3 and user finalist selection. All analytical results and activity are sanitized deterministic demonstration fixtures. No live research, provider, market-data, authentication or execution service is connected.
+A public React/TypeScript prototype of a continuous thesis-to-research experience, implemented through Expression and completed Result. All analytical results and activity are sanitized deterministic demonstration fixtures. No live research, provider, market-data, option-chain, authentication or execution service is connected.
 
-The active journey is observation → thesis conversation/editing → thesis lock → Discovery and candidate curation → Wash 1: Reality & Recognition → Wash 2: Thesis Survival → Wash 3: Adversarial Confirmation → finalist selection. Proceed to Expression saves the local selection and displays a checkpoint stop. Expression and completed Result are not implemented in the active Alpha journey.
+The active journey is observation → thesis conversation/editing → thesis lock → Discovery and candidate curation → Wash 1: Reality & Recognition → Wash 2: Thesis Survival → Wash 3: Adversarial Confirmation → finalist selection → Expression → Result. Each selected finalist retains its confirmed demonstration expression and independent completed output. Result summarizes saved research without another research pass, then ends the journey.
 
-This status describes implementation baseline `0c50bca0f2551ba1ee280e3c47262144982f45ee`; subsequent documentation commits do not change that behavior.
+This status describes implementation baseline `d798c0a5834eb45118abde4e55fea8cd4fbf534e`; subsequent documentation commits do not change that behavior.
+
+Scott is entering an extended Alpha 003 review/refinement period. The current UX is not presumed final; structural, experience and cosmetic findings will be captured separately. Completion does not start live integration.
 
 ## Experience and state
 
 The temporary thesis assistant produces one deterministic response around an AI-infrastructure example to accelerate UX review. Production conversation length is intended to depend on thesis sufficiency, not a fixed turn count. Enter submits; Shift+Enter inserts a newline; composition input is protected. The user can edit and approve the thesis before locking it.
 
-After lock, the canonical white logo shrinks while remaining centered above the compact sticky progression rail. Activity and results unfold in one mounted canvas. Completed/current stages are navigable; future stages remain disabled. Viewing history does not rerun research or roll back progress. Prior-stage selections and user exclusions remain preserved.
+After lock, the canonical white logo shrinks while remaining centered above the compact sticky progression rail. Activity and results unfold in one mounted canvas. Completed/current stages are navigable; all seven are available after Result. The completed header shows Research Complete with no next-stage action. Viewing history does not rerun research or roll back progress. Prior-stage selections and user exclusions remain preserved.
 
-ResearchRun is the primary presentation state: conversation, frozen thesis, candidate history, curation, wash results, T0–T3 trajectories and finalists remain part of the same journey. Exclusion is separate from analytical rejection and never deletes history. Eligible finalists are explicitly selected by the user; upstream failure or insufficient evidence cannot be repaired by proceeding to Expression.
+ResearchRun is the primary presentation state: conversation, frozen thesis, candidate history, curation, wash results, T0–T3 trajectories, finalists, Expression and Result remain part of the same journey. Exclusion is separate from analytical rejection and never deletes history. Eligible finalists are explicitly selected by the user; upstream failure or insufficient evidence cannot be repaired by proceeding to Expression.
 
 The interface retains a black foundation, restrained white/gray palette, compact typography, progressive disclosure, meaningful state transitions, keyboard access and reduced-motion behavior. The supplied canonical SVG in `public/fidelis-logo.svg` retains its original geometry and colors.
 
@@ -23,9 +25,11 @@ State is in memory and resets on reload. Backend persistence and account claimin
 - `src/checkpoint`: thesis interaction, ResearchRun reducer, research header and progression navigation.
 - `src/discovery`: typed activity/state, pathway and candidate fixtures, Recall, inspection and curation.
 - `src/wash1`, `src/wash2`, `src/wash3`: stage-specific typed models, normalized fixtures, state transitions and presentation. Wash 3 includes adversarial challenges, evidence conflicts, comparative tradeoffs, T3 trajectories and finalist selection.
+- `src/expression`: independent finalist preferences, qualitative strategy-family comparison and explicit confirmation.
+- `src/result`: synthesis of saved research, qualitative Thesis Support, separate Evidence Confidence, Case For/Against, failure conditions and history inspection. No calibrated probability or current contract recommendation is supplied.
 - `src/test`: automated regression coverage for the implemented journey, state preservation, interaction and stage boundaries.
 
-Fixture data, analytical state and presentation remain separate. Earlier prototype modules outside this active journey do not establish shipped Expression or Result functionality.
+Fixture data, analytical state and presentation remain separate. Completed Result uses the saved research and confirmed Expression state; it performs no new research or option execution.
 
 The future integration seam is a bounded API delivering normalized results and meaningful research-activity events to ResearchRun. The public client presents interactions and explanations; private engine methodology and any administrative control plane remain outside this client. Current simulated activity must not be mistaken for actual backend work. Live integration, provider comparison, persistence and administrative capabilities require separately authorized implementation.
 
@@ -42,7 +46,7 @@ pnpm build
 pnpm scan
 ```
 
-The automated tests validate deterministic behavior. Browser review additionally covers desktop/mobile layout, keyboard interaction, reduced motion, historical navigation and the non-executing Expression stop. `pnpm scan` checks the production distribution for prohibited content; review source changes for publication safety as well.
+The automated tests validate deterministic behavior. Browser review additionally covers desktop/mobile layout, keyboard interaction, reduced motion, historical navigation and the complete Observation-to-Result journey. `pnpm scan` checks the production distribution for prohibited content; review source changes for publication safety as well.
 
 ## Build and deployment
 
