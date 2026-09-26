@@ -133,3 +133,31 @@ html:has(.research-mode) { scroll-padding-top:150px; }
  .viewing-state { font-size:9px; }
  html:has(.research-mode) { scroll-padding-top:180px; }
 }
+
+/* Shared Proceed treatment for the active ResearchRun header and stage footer. */
+.checkpoint :is(.sticky-proceed, .discovery-proceed) button {
+ background:#c5a45a;
+ color:#111;
+ border:1px solid #c5a45a;
+ border-radius:3px;
+}
+.checkpoint .discovery-proceed button { padding:9px 12px; }
+.checkpoint :is(.sticky-proceed, .discovery-proceed) button:hover:not(:disabled) {
+ background:#d6b66c;
+ border-color:#d6b66c;
+}
+.checkpoint :is(.sticky-proceed, .discovery-proceed) button:active:not(:disabled) {
+ background:#b18e45;
+ border-color:#b18e45;
+}
+.checkpoint :is(.sticky-proceed, .discovery-proceed) button:focus-visible {
+ outline:2px solid #e4cb91;
+ outline-offset:3px;
+}
+.checkpoint :is(.sticky-proceed, .discovery-proceed) button:disabled {
+ background:#29251c;
+ border-color:#514632;
+ color:#a69b82;
+ opacity:1;
+ cursor:default;
+}
