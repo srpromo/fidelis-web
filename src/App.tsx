@@ -1,3 +1,4 @@
+import {ThesisDrawer} from './discovery/ThesisDrawer';
 import {ResultExperience} from './result/ResultExperience';
 import {ExpressionExperience} from './expression/ExpressionExperience';
 import {Wash3Experience} from './wash3/Wash3Experience';
@@ -65,6 +66,7 @@ export default function App() {
     {run.result?<div className="sticky-proceed"><small role="status">Research Complete</small></div>:run.expression?<div className="sticky-proceed"><button disabled={run.expression.status!=='COMPLETE'} onClick={()=>dispatch({type:'READY_FOR_RESULT'})}>Proceed to Result</button></div>:run.wash3?<div className="sticky-proceed">{run.wash3.status==='COMPLETE'&&<><button disabled={!selectedFinalists(run.wash3).length} onClick={()=>dispatch({type:'START_EXPRESSION'})}>Proceed to Expression · {selectedFinalists(run.wash3).length} selected</button></>}</div>:run.wash2?.status==='COMPLETE'?<div className="sticky-proceed"><button disabled={!wash2Count(run.wash2)} onClick={()=>dispatch({type:'START_WASH3'})}>Proceed to Wash 3 · {wash2Count(run.wash2)} candidates</button></div>:!run.wash2&&run.wash1?.status==='COMPLETE'?<div className="sticky-proceed"><button disabled={!wash1Count(run.wash1)} onClick={()=>dispatch({type:'START_WASH2'})}>Proceed to Wash 2 · {wash1Count(run.wash1)} candidates</button>{run.wash1.readyForWash2&&<small role="status">Ready · Checkpoint 3 stop</small>}</div>:!run.wash1&&run.discovery?.status==='COMPLETE'?<div className="sticky-proceed"><button disabled={!discoveryCounts(run.discovery).proceed} onClick={()=>dispatch({type:'START_WASH1'})}>Proceed to Wash 1 · {discoveryCounts(run.discovery).proceed} candidates</button></div>:null}</>}
 
     </ResearchHeader>
+    {locked&&run.lockedThesis&&<ThesisDrawer thesis={run.lockedThesis.proposition} runId={run.runId}/>}
     <main id="continuous-canvas" className="continuous-canvas">
  {locked && !!run.wash1 && <>
         <p className="lock-confirmation" role="status">Thesis locked · {run.runId}</p>
