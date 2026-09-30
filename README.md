@@ -12,13 +12,13 @@ Scott is entering an extended Alpha 003 review/refinement period. The current UX
 
 The temporary thesis assistant produces one deterministic response around an AI-infrastructure example to accelerate UX review. Production conversation length is intended to depend on thesis sufficiency, not a fixed turn count. Enter submits; Shift+Enter inserts a newline; composition input is protected. The user can edit and approve the thesis before locking it.
 
-After lock, the canonical white logo shrinks while remaining centered above the compact sticky progression rail. Activity and results unfold in one mounted canvas. Completed/current stages are navigable; all seven are available after Result. The completed header shows Research Complete with no next-stage action. Viewing history does not rerun research or roll back progress. Prior-stage selections and user exclusions remain preserved.
+After lock, the canonical white logo anchors a collapsible member sidebar; a mobile menu provides the same destinations. The sticky research header focuses on progression and Proceed. Activity and results unfold in one mounted canvas. Completed/current stages are navigable; all seven are available after Result. The completed header shows Research Complete with no next-stage action. Viewing history does not rerun research or roll back progress. Prior-stage selections and user exclusions remain preserved.
 
 ResearchRun is the primary presentation state: conversation, frozen thesis, candidate history, curation, wash results, T0–T3 trajectories, finalists, Expression and Result remain part of the same journey. Exclusion is separate from analytical rejection and never deletes history. Eligible finalists are explicitly selected by the user; upstream failure or insufficient evidence cannot be repaired by proceeding to Expression.
 
 The interface retains a black foundation, restrained white/gray palette, compact typography, progressive disclosure, meaningful state transitions, keyboard access and reduced-motion behavior. The supplied canonical SVG in `public/fidelis-logo.svg` retains its original geometry and colors.
 
-State is in memory and resets on reload. Backend persistence and account claiming are not implemented. Authentication and entitlement boundaries are disabled for Alpha review; login is a placeholder. This does not define future commercial policy.
+Research and member-demo state are in memory and reset on reload. Backend persistence and account claiming are not implemented. Authentication and entitlement boundaries are disabled for Alpha review; login is a placeholder. This does not define future commercial policy.
 
 ## Frontend architecture
 
@@ -55,3 +55,13 @@ Vite uses `/fidelis-web/` as its asset base. The existing `.github/workflows/web
 Live Alpha: <https://srpromo.github.io/fidelis-web/>.
 
 Only the isolated public frontend belongs in this repository. Do not include credentials, private engine implementation, research evidence, internal artifacts or private filesystem paths. The static demonstration requires no runtime secrets and makes no research/provider requests.
+
+## Member-space prototype
+
+My Research, My Experiments and Groups are session-only interface demonstrations. The current ResearchRun stays mounted when switching views; returning preserves progress and candidate decisions. Example dossiers cannot start live analysis.
+
+Research is individually owned and private by default. Group sharing copies an explicitly selected thesis snapshot into a selected local demo group without transferring ownership. Only shared fictional experiments appear in that group’s sample boards and experiment cards. Comments and reactions remain in the tab. Invitation previews do not send messages or create working links.
+
+Paper results use fictional participants, hand-authored paths and one fixed comparison window with equal starting capital. Underlying and expression boards are separate; missing expression data is unranked. Entry theses remain distinct from later commentary. These samples are not market observations, executed trades, measured Alpha outcomes or validated efficacy; no Outcome Experiment or learning service is implemented.
+
+Future connections require separately authorized authentication, ownership/membership enforcement, persistence, actual invitation delivery and sourced paper-performance measurement. The public UI contains no private engine methodology or administrative configuration. No subscription tiers, prices or gates are implied.

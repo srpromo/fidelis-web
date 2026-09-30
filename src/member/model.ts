@@ -1,0 +1,36 @@
+export type MemberView='run'|'research'|'experiments'|'groups';
+export type Board='underlying'|'expression';
+export interface SharedResearch {id:string;owner:string;title:string;thesis:string;status:string;sample:boolean}
+export interface Comment {author:string;text:string}
+export interface Group {id:string;name:string;description:string;members:string[];shares:SharedResearch[];comments:Comment[];reactions:string[]}
+export interface MemberState {groups:Group[]}
+export const you='You (demo)';
+export const sampleResearch:SharedResearch[]=[
+ {id:'sample-power',owner:you,title:'Power follows compute',thesis:'Physical power capacity may constrain the value of new compute installations. Test whether committed projects turn into profitable equipment demand.',status:'Completed sample',sample:true},
+ {id:'sample-water',owner:you,title:'The hidden cost of water',thesis:'Water reuse equipment could become more important as industrial facilities face tighter resource constraints. Test economic materiality before selecting a company.',status:'Proposed sample',sample:true},
+ {id:'sample-network',owner:'Maya (fictional)',title:'The network behind the model',thesis:'Larger compute clusters may require more network capacity per installation. Orders must survive customer concentration and pricing pressure.',status:'Completed sample',sample:true},
+ {id:'sample-cooling',owner:'Theo (fictional)',title:'Cooling is capacity',thesis:'Higher rack density may make cooling a prerequisite to usable compute. Test adoption timing and cash conversion.',status:'Completed sample',sample:true},
+ {id:'sample-factory',owner:'Inez (fictional)',title:'A factory-cycle inflection',thesis:'A recovery in factory investment could benefit equipment suppliers. The thesis fails if announced projects never become funded orders.',status:'Completed sample',sample:true}
+];
+export const initialMember=():MemberState=>({groups:[{id:'infrastructure',name:'Infrastructure thinkers',description:'Compare causal theses, challenge assumptions and learn from what changed.',members:[you,'Maya (fictional)','Theo (fictional)','Inez (fictional)'],shares:sampleResearch.filter(r=>r.owner!==you).map(r=>({...r})),comments:[{author:'Maya (fictional)',text:'A strong demand story still needs a route from orders to cash. What would change your mind?'},{author:'Theo (fictional)',text:'My cooling example underestimated the installation lag. I would track timing separately next time.'}],reactions:[]}]});
+export type MemberAction={type:'CREATE_GROUP';name:string;description:string}|{type:'SHARE';groupId:string;research:SharedResearch}|{type:'UNSHARE';groupId:string;researchId:string}|{type:'COMMENT';groupId:string;text:string}|{type:'REACT';groupId:string;researchId:string};
+export function memberReducer(state:MemberState,action:MemberAction):MemberState {
+ if(action.type==='CREATE_GROUP'){const name=action.name.trim();if(!name||name.length>60||action.description.length>240)return state;return {...state,groups:[...state.groups,{id:`local-${state.groups.length+1}`,name,description:action.description.trim(),members:[you],shares:[],comments:[],reactions:[]}]}}
+ const group=state.groups.find(g=>g.id===action.groupId);if(!group||!group.members.includes(you))return state;
+ let next=group;
+ if(action.type==='SHARE'){if(action.research.owner!==you||!action.research.thesis.trim()||group.shares.some(r=>r.id===action.research.id))return state;next={...group,shares:[...group.shares,{...action.research}]}}
+ if(action.type==='UNSHARE'){const own=group.shares.find(r=>r.id===action.researchId);if(!own||own.owner!==you)return state;next={...group,shares:group.shares.filter(r=>r.id!==own.id),reactions:group.reactions.filter(id=>id!==own.id)}}
+ if(action.type==='COMMENT'){const text=action.text.trim();if(!text||text.length>500)return state;next={...group,comments:[...group.comments,{author:you,text}]}}
+ if(action.type==='REACT'){if(!group.shares.some(r=>r.id===action.researchId))return state;next={...group,reactions:group.reactions.includes(action.researchId)?group.reactions.filter(id=>id!==action.researchId):[...group.reactions,action.researchId]}}
+ return {...state,groups:state.groups.map(g=>g.id===next.id?next:g)};
+}
+export const cohort={start:'2025-01-02',end:'2025-03-31',days:88,capital:10000,source:'Fidelis hand-authored fictional paper examples'};
+export interface PaperExperiment {id:string;researchId:string;status:'Active sample'|'Resolved sample';underlying:number;expression:number|null;underlyingDrawdown:number;expressionDrawdown:number|null;underlyingPath:number[];expressionPath:number[]|null;logic:string;learned:string;expressionAssumptions:string}
+export const experiments:PaperExperiment[]=[
+ {id:'paper-power',researchId:'sample-power',status:'Resolved sample',underlying:8,expression:14,underlyingDrawdown:4,expressionDrawdown:12,underlyingPath:[100,103,99,106,108],expressionPath:[100,107,95,110,114],logic:'Power equipment is a physical prerequisite, but economic capture must be distinguished from headline demand.',learned:'The sample thesis held while delivery timing remained uneven. Expression sensitivity amplified interim losses.',expressionAssumptions:'Fictional bullish call-spread basket; entire $10,000 paper debit at entry, no leverage beyond the debit; marked at the common window end.'},
+ {id:'paper-network',researchId:'sample-network',status:'Active sample',underlying:11,expression:19,underlyingDrawdown:3,expressionDrawdown:9,underlyingPath:[100,104,101,106,111],expressionPath:[100,108,99,113,119],logic:'Network intensity could grow with cluster size; the key question is whether supplier economics capture that growth.',learned:'The sample favors the pathway but has not resolved the customer-concentration concern.',expressionAssumptions:'Fictional bullish call-spread basket; $10,000 debit fully allocated; same entry and common mark date as every expression row.'},
+ {id:'paper-cooling',researchId:'sample-cooling',status:'Resolved sample',underlying:-4,expression:-12,underlyingDrawdown:7,expressionDrawdown:18,underlyingPath:[100,102,95,98,96],expressionPath:[100,105,87,91,88],logic:'Cooling can be necessary without delivering timely shareholder value. Adoption and payment schedules matter.',learned:'The fictional result illustrates that a sound physical need can still be a poorly timed expression.',expressionAssumptions:'Fictional bullish call-spread basket; $10,000 maximum initial debit at risk, marked at the same common end date.'},
+ {id:'paper-factory',researchId:'sample-factory',status:'Active sample',underlying:3,expression:null,underlyingDrawdown:5,expressionDrawdown:null,underlyingPath:[100,98,95,101,103],expressionPath:null,logic:'Project announcements are a starting hypothesis; funded orders are the test.',learned:'The sample remains unresolved. No options expression was supplied, so it cannot enter that board.',expressionAssumptions:'No expression sample available.'}
+];
+export function leaderboard(board:Board,memberNames:string[],sharedIds:string[]){return experiments.filter(e=>sharedIds.includes(e.researchId)&&memberNames.includes(sampleResearch.find(r=>r.id===e.researchId)!.owner)&&e[board]!==null).sort((a,b)=>(b[board]??0)-(a[board]??0)||a.id.localeCompare(b.id))}
+export const signed=(value:number|null)=>value===null?'Unavailable':`${value>0?'+':''}${value.toFixed(1)}%`;

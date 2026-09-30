@@ -1,3 +1,4 @@
+import {MemberShell} from './member/MemberShell';
 import {ThesisDrawer} from './discovery/ThesisDrawer';
 import {ResultExperience} from './result/ResultExperience';
 import {ExpressionExperience} from './expression/ExpressionExperience';
@@ -33,6 +34,7 @@ export default function App() {
     useEffect(()=>{
         if(!locked)return;
         const updateViewed=()=>{
+            if(document.querySelector('.research-session[hidden]'))return;
             const header=Math.max(document.querySelector('.research-header')?.getBoundingClientRect().bottom??0,parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)-31||0);
             const discovery=document.getElementById('saved-discovery')?.getBoundingClientRect().top??0;
             const wash=document.getElementById('saved-wash1')?.getBoundingClientRect().top;
@@ -59,7 +61,7 @@ export default function App() {
     finally {
         setBusy(false);
     } }
-    return <div className={`checkpoint ${locked ? 'research-mode' : run.conversation.length ? 'conversation-mode' : 'arrival-mode'}`}>
+    return <MemberShell active={locked} run={run}><div className={`checkpoint ${locked ? 'research-mode' : run.conversation.length ? 'conversation-mode' : 'arrival-mode'}`}>
     <a className="skip-link" href="#continuous-canvas">Skip to canvas</a>
     <ResearchHeader locked={locked} started={!!run.conversation.length}>
     {locked&&<><div className="research-navigation"><ProgressionRail viewed={viewed} onNavigate={navigate} discoveryAvailable={!!run.discovery} discoveryComplete={run.discovery?.status==='COMPLETE'} washAvailable={!!run.wash1} washComplete={run.wash1?.status==='COMPLETE'} wash2Available={!!run.wash2} wash2Complete={run.wash2?.status==='COMPLETE'} wash3Available={!!run.wash3} wash3Complete={run.wash3?.status==='COMPLETE'} expressionAvailable={!!run.expression} expressionComplete={run.expression?.status==='COMPLETE'} resultAvailable={!!run.result}/><p className="viewing-state">Viewing saved {viewed} · Research: {run.result?'Complete':run.expression?'Expression':run.wash3?'Wash 3':run.wash2?'Wash 2':run.wash1?'Wash 1':'Discovery'}</p></div>
@@ -67,7 +69,7 @@ export default function App() {
 
     </ResearchHeader>
     {locked&&run.lockedThesis&&<ThesisDrawer thesis={run.lockedThesis.proposition} runId={run.runId}/>}
-    <main id="continuous-canvas" className="continuous-canvas">
+    <main id="continuous-canvas" className="continuous-canvas" tabIndex={-1}>
  {locked && !!run.wash1 && <>
         <p className="lock-confirmation" role="status">Thesis locked · {run.runId}</p>
         </>}
@@ -83,5 +85,5 @@ export default function App() {
  {run.expression&&<div id="saved-expression" tabIndex={-1} aria-label="Saved Expression"><>{run.result&&expandedStage!=='Expression'&&<div className="saved-stage-summary"><span>Expression · confirmed decisions</span><button onClick={()=>navigate('Expression')}>Inspect saved Expression</button></div>}<div hidden={!!run.result&&expandedStage!=='Expression'}><ExpressionExperience run={run} dispatch={dispatch}/></div></></div>}
  {run.result&&<div id="saved-result" tabIndex={-1} aria-label="Saved Result"><ResultExperience run={run} dispatch={dispatch} navigate={navigate}/></div>}
  </main>
-    </div>;
+    </div></MemberShell>;
 }

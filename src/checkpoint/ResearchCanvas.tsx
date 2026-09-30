@@ -2,7 +2,7 @@ import type {ReactNode} from 'react';
 export type ViewedStage = 'Thesis' | 'Discovery' | 'Wash 1' | 'Wash 2' | 'Wash 3' | 'Expression' | 'Result';
 export function ResearchHeader({locked, started, children}: {locked:boolean; started:boolean; children?:ReactNode}) {
  return <header className={`research-header ${locked?'compact':started?'conversing':''}`} aria-label={locked?'Research navigation':undefined}>
- <img className="canonical-logo" src={`${import.meta.env.BASE_URL}fidelis-logo.svg`} width="720" height="720" alt="Fidelis"/>
+ {!locked&&<img className="canonical-logo" src={`${import.meta.env.BASE_URL}fidelis-logo.svg`} width="720" height="720" alt="Fidelis"/>}
  {children}
  {!locked&&<button className="login" disabled title="Login is not available in this checkpoint">Log in</button>}
  </header>;
