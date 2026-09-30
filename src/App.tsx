@@ -66,7 +66,7 @@ export default function App() {
 
     </ResearchHeader>
     <main id="continuous-canvas" className="continuous-canvas">
- {locked && <>
+ {locked && !!run.wash1 && <>
         <p className="lock-confirmation" role="status">Thesis locked · {run.runId}</p>
         </>}
  {run.wash2&&expandedStage!=='Thesis'&&<div className="saved-stage-summary"><span>Thesis · locked research anchor</span><button onClick={()=>navigate('Thesis')}>Inspect saved Thesis</button></div>}

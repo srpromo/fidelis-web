@@ -124,10 +124,23 @@ export function checkpointReducer(run: CheckpointRun, action: CheckpointAction):
     }
     if(action.type==='START_WASH1'&&run.discovery?.status==='COMPLETE'&&discoveryCounts(run.discovery).proceed>0){
         const wash1=startWash1(run.discovery);
+        if(wash1.participants.some(t=>!wash1Fixtures[t]))return run;
         return {...run,wash1,stage:'WASH_1',event:run.event+1,discovery:{...run.discovery,readyToSave:true},universe:Object.fromEntries(wash1.participants.map(t=>[t,{ticker:t,trajectory:[structuredClone(wash1Fixtures[t].t0)],userExcluded:false,introducedAt:'DISCOVERY'}]))};
     }
     if (run.lockedThesis && run.discovery) {
         if(action.type==='DISCOVERY_EVENT') {const discovery=applyDiscoveryEvent(run.discovery,action.event);return discovery===run.discovery?run:{...run,discovery,activity:[...run.activity,action.event]};}
+        if(action.type==='ADD_DISCOVERY_CANDIDATE'&&run.discovery.status==='COMPLETE') {
+            const ticker=action.ticker.trim().toUpperCase();
+            if(!/^[A-Z][A-Z0-9.-]{0,9}$/.test(ticker)||action.rationale.length>500)return run;
+            const d=run.discovery;if(d.userAdditions?.[ticker]&&!d.userAdditions[ticker].removed)return run;
+            const rationale=action.rationale.trim();const history=d.additionHistory??[];
+            return {...run,discovery:{...d,userAdditions:{...d.userAdditions,[ticker]:{ticker,rationale,removed:false}},additionHistory:[...history,{ticker,action:'ADDED',rationale,ordinal:history.length+1}]}};
+        }
+        if(action.type==='REMOVE_DISCOVERY_ADDITION'&&run.discovery.status==='COMPLETE') {
+            const d=run.discovery;const old=d.userAdditions?.[action.ticker];if(!old||old.removed)return run;
+            const history=d.additionHistory??[];
+            return {...run,discovery:{...d,userAdditions:{...d.userAdditions,[action.ticker]:{...old,removed:true}},additionHistory:[...history,{ticker:action.ticker,action:'REMOVED',rationale:old.rationale,ordinal:history.length+1}]}};
+        }
         if(action.type==='CURATE_DISCOVERY'&&run.discovery.status==='COMPLETE') {
             const old=run.discovery.candidates[action.ticker];if(!old||old.validation!=='VALIDATED')return run;
             const excluding=old.userState==='RETAINED';return {...run,discovery:{...run.discovery,readyToSave:false,candidates:{...run.discovery.candidates,[action.ticker]:{...old,userState:excluding?'USER_EXCLUDED':'RETAINED'}},decisions:[...run.discovery.decisions,{ticker:action.ticker,decision:excluding?'USER_EXCLUDED':'USER_REINCLUDED',ordinal:run.discovery.decisions.length+1}]}};

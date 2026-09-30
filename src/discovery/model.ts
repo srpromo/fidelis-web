@@ -8,8 +8,10 @@ export interface DiscoveryCandidate {ticker:string;company:string;pathway:string
 export interface ResearchActivityEvent {id:string;type:DiscoveryEventType|Wash1EventType|Wash2EventType|Wash3EventType;origin:'LOCAL_DEMO'|'FIDELIS_SERVICE';message:string;sequence?:number;pathway?:DiscoveryPathway;candidate?:DiscoveryCandidate;ticker?:string}
 export interface CandidateDiscoveryState {candidate:DiscoveryCandidate;validation:'PENDING'|'VALIDATED'|'REJECTED';userState:'RETAINED'|'USER_EXCLUDED'}
 export interface UserCandidateDecision {ticker:string;decision:'USER_EXCLUDED'|'USER_REINCLUDED';ordinal:number}
-export interface DiscoveryResult {status:'RUNNING'|'COMPLETE';cursor:number;pathways:DiscoveryPathway[];candidates:Record<string,CandidateDiscoveryState>;decisions:UserCandidateDecision[];readyToSave:boolean}
-export type DiscoveryAction={type:'DISCOVERY_EVENT';event:ResearchActivityEvent}|{type:'CURATE_DISCOVERY';ticker:string}|{type:'READY_FOR_WASH'};
+export interface UserCandidateAddition {ticker:string;rationale:string;removed:boolean}
+export interface UserAdditionEvent {ticker:string;action:'ADDED'|'REMOVED';rationale:string;ordinal:number}
+export interface DiscoveryResult {status:'RUNNING'|'COMPLETE';cursor:number;pathways:DiscoveryPathway[];candidates:Record<string,CandidateDiscoveryState>;decisions:UserCandidateDecision[];readyToSave:boolean;userAdditions?:Record<string,UserCandidateAddition>;additionHistory?:UserAdditionEvent[]}
+export type DiscoveryAction={type:'ADD_DISCOVERY_CANDIDATE';ticker:string;rationale:string}|{type:'REMOVE_DISCOVERY_ADDITION';ticker:string}|{type:'DISCOVERY_EVENT';event:ResearchActivityEvent}|{type:'CURATE_DISCOVERY';ticker:string}|{type:'READY_FOR_WASH'};
 export const initialDiscovery=():DiscoveryResult=>({status:'RUNNING',cursor:0,pathways:[],candidates:{},decisions:[],readyToSave:false});
 export function discoveryCounts(d:DiscoveryResult){const all=Object.values(d.candidates);return {examined:all.length,validated:all.filter(c=>c.validation==='VALIDATED').length,rejected:all.filter(c=>c.validation==='REJECTED').length,pending:all.filter(c=>c.validation==='PENDING').length,recall:all.filter(c=>c.candidate.recall&&c.validation==='VALIDATED').length,proceed:all.filter(c=>c.validation==='VALIDATED'&&c.userState==='RETAINED').length}}
 export function applyDiscoveryEvent(d:DiscoveryResult,e:ResearchActivityEvent):DiscoveryResult{
